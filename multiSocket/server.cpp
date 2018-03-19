@@ -16,6 +16,7 @@ void error_handling(char *message);
 
 int clnt_number = 0;
 int clnt_socks[10];
+socklen_t clnt_addr_sizes[10];
 
 pthread_mutex_t mutx;
 
@@ -56,10 +57,12 @@ int main(int argc, char **argv){
   while(true){
     clnt_addr_size = sizeof(clnt_addr);
     clnt_sock = accept(serv_sock, (struct sockaddr *) &clnt_addr, (socklen_t *) &clnt_addr_size);
+    printf("clnt addr size : %d\n", clnt_addr_size); 
 
     pthread_mutex_lock(&mutx);
-
+    clnt_addr_sizes[clnt_number] = clnt_addr_size;
     clnt_socks[clnt_number++] = clnt_sock;
+    
     pthread_mutex_unlock(&mutx);
 
     pthread_create(&thread, NULL, clnt_connection, (void *) &clnt_sock);
@@ -75,7 +78,10 @@ void *clnt_connection(void *arg){
   int i;
 
   while((str_len = read(clnt_sock, message, sizeof(message))) != 0){
+    struct sockaddr_in peer_addr;
+    getpeername(clnt_sock, (struct sockaddr *) &peer_addr, clnt_addr_sizes + 0); 
     send_message(message, str_len);
+    printf("peer name : %s", inet_ntoa(peer_addr.sin_addr));
   }
 
   pthread_mutex_lock(&mutx);
@@ -83,6 +89,7 @@ void *clnt_connection(void *arg){
     if (clnt_sock == clnt_socks[i]){
       for (; i < clnt_number - 1; i ++){
         clnt_socks[i] = clnt_socks[i+1];
+        clnt_addr_sizes[i] = clnt_addr_sizes[i+1];
       }
       break;
     }
