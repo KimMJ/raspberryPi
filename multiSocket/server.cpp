@@ -11,7 +11,7 @@
 #define BUFSIZE 100
 
 void* clnt_connection(void *arg);
-void send_message(char *message, int len);
+void send_message(char *message, int len, int sender_fd);
 void error_handling(char *message);
 
 int clnt_number = 0;
@@ -80,7 +80,7 @@ void *clnt_connection(void *arg){
   while((str_len = read(clnt_sock, message, sizeof(message))) != 0){
     struct sockaddr_in peer_addr;
     getpeername(clnt_sock, (struct sockaddr *) &peer_addr, clnt_addr_sizes + 0); // must change!!
-    send_message(message, str_len);
+    send_message(message, str_len, clnt_sock);
     printf("peer name : %s\n", inet_ntoa(peer_addr.sin_addr));
   }
 
@@ -102,12 +102,16 @@ void *clnt_connection(void *arg){
   return 0;
 }
 
-void send_message(char *message, int len){
+void send_message(char *message, int len, int sender_fd){
   int i;
   pthread_mutex_lock(&mutx);
-
+  struct sockaddr_in sender_addr, rcv_addr;
+  getpeername(sender_fd, (struct sockaddr *) &sender_addr, clnt_addr_sizes + 0);
   for (i = 0; i < clnt_number; i ++){
-    write(clnt_socks[i], message, len);
+    getpeername(clnt_socks[i], (struct sockaddr *) &rcv_addr, clnt_addr_sizes + 0);
+    if (strcmp(inet_ntoa(sender_addr.sin_addr), inet_ntoa(rcv_addr.sin_addr)) != 0){
+      write(clnt_socks[i], message, len);
+    }
   }
 
   pthread_mutex_unlock(&mutx);
