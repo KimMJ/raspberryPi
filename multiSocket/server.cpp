@@ -84,7 +84,7 @@ int main(int argc, char **argv){
     
     pthread_mutex_unlock(&mutx);
 
-    pthread_create(&thread, NULL, clnt_connection, (void *) &tmp);
+    pthread_create(&thread, NULL, clnt_connection, (void *) &clients[clnt_number-1]);
     printf(" IP : %s \n", inet_ntoa(clnt_addr.sin_addr));
   }
   return 0;
@@ -127,8 +127,9 @@ void send_message(char *message, int len, struct client clnt){
   getpeername(clnt.socket, (struct sockaddr *) &sender_addr, &clnt.addr_size);
   std::string sender = inet_ntoa(sender_addr.sin_addr);
   for (i = 0; i < clnt_number; i ++){
-    getpeername(clnt.socket, (struct sockaddr *) &rcv_addr, &clnt.addr_size);
+    getpeername(clients[i].socket, (struct sockaddr *) &rcv_addr, &clients[i].addr_size);
     std::string receiver = inet_ntoa(rcv_addr.sin_addr);
+    printf("%s, %s\n", sender.c_str(), receiver.c_str());
     if (sender != receiver){
       write(clients[i].socket, message, len);
     }
