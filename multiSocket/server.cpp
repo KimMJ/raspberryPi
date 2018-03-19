@@ -109,6 +109,7 @@ void send_message(char *message, int len, int sender_fd){
   getpeername(sender_fd, (struct sockaddr *) &sender_addr, clnt_addr_sizes + 0);
   for (i = 0; i < clnt_number; i ++){
     getpeername(clnt_socks[i], (struct sockaddr *) &rcv_addr, clnt_addr_sizes + 0);
+    printf("sender : %s , receiver : %s\n", inet_ntoa(sender_addr.sin_addr), inet_ntoa(rcv_addr.sin_addr));
     if (strcmp(inet_ntoa(sender_addr.sin_addr), inet_ntoa(rcv_addr.sin_addr)) != 0){
       write(clnt_socks[i], message, len);
     }
