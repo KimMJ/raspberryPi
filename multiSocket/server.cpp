@@ -79,9 +79,9 @@ void *clnt_connection(void *arg){
 
   while((str_len = read(clnt_sock, message, sizeof(message))) != 0){
     struct sockaddr_in peer_addr;
-    getpeername(clnt_sock, (struct sockaddr *) &peer_addr, clnt_addr_sizes + 0); 
+    getpeername(clnt_sock, (struct sockaddr *) &peer_addr, clnt_addr_sizes + 0); // must change!!
     send_message(message, str_len);
-    printf("peer name : %s", inet_ntoa(peer_addr.sin_addr));
+    printf("peer name : %s\n", inet_ntoa(peer_addr.sin_addr));
   }
 
   pthread_mutex_lock(&mutx);
