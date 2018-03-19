@@ -23,7 +23,7 @@ int main(int argc, char **argv){
   pthread_t snd_thread, rcv_thread;
   void *thread_result;
 
-  if (argc != 4){
+  if (argc != 3){
     printf("Usage : %s <ip> <port> \n", argv[0]);
     exit(1);
   }
