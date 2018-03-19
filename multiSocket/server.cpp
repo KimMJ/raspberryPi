@@ -113,7 +113,7 @@ void send_message(char *message, int len, int sender_fd){
     getpeername(clnt_socks[i], (struct sockaddr *) &rcv_addr, clnt_addr_sizes + 0);
     std::string receiver = inet_ntoa(rcv_addr.sin_addr);
     printf("sender : %s , receiver : %s\n", sender.c_str(), receiver.c_str());
-    if (strcmp(inet_ntoa(sender_addr.sin_addr), inet_ntoa(rcv_addr.sin_addr)) != 0){
+    if (sender == receiver){
       write(clnt_socks[i], message, len);
     }
   }
