@@ -23,13 +23,14 @@ int main(int argc, char **argv){
   pthread_t snd_thread, rcv_thread;
   void *thread_result;
 
-  if (argc != 3){
+  if (!((argc == 4) || (argc == 3))){
     printf("Usage : %s <ip> <port> \n", argv[0]);
     exit(1);
   }
 
-  sprintf(name, "[%s]", argv[3]);
-
+  if (argc == 4){
+    sprintf(name, "[%s]", argv[3]);
+  }
   sock = socket(AF_INET, SOCK_STREAM, 0);
   if (sock == -1){
     error_handling(const_cast<char *>("socket() error"));
