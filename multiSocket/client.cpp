@@ -7,30 +7,29 @@
 #include <sys/socket.h>
 #include <pthread.h>
 
-#define NAMESIZE 20
+//#define NAMESIZE 20
 #define BUFSIZE 100
+#define LED 4 // BCM_GPIO 23
 
 void *send_message(void *arg);
 void *recv_message(void *arg);
 void error_handling(char *message);
 
-char name[NAMESIZE] = "[Default]";
+//char name[NAMESIZE] = "[Default]";
 char message[BUFSIZE];
+bool ledLight = false;
 
 int main(int argc, char **argv){
   int sock;
   struct sockaddr_in serv_addr;
-  pthread_t snd_thread, rcv_thread;
+  pthread_t snd_thread, rcv_thread, led_thread;
   void *thread_result;
 
-  if (!((argc == 4) || (argc == 3))){
+  if (!(argc == 3)){
     printf("Usage : %s <ip> <port> \n", argv[0]);
     exit(1);
   }
 
-  if (argc == 4){
-    sprintf(name, "[%s]", argv[3]);
-  }
   sock = socket(AF_INET, SOCK_STREAM, 0);
   if (sock == -1){
     error_handling(const_cast<char *>("socket() error"));
@@ -48,8 +47,19 @@ int main(int argc, char **argv){
   pthread_create(&snd_thread, NULL, send_message, (void *) &sock);
   pthread_create(&rcv_thread, NULL, recv_message, (void *) &sock);
 
+
+  //setup
+  if (wiringPiSetup() == -1){
+    return 1;
+  }
+
+  pinMode(LED1, OUTPUT);
+
+  pthread_create(&led_thread, NULL, led_react, NULL);
+
   pthread_join(snd_thread, &thread_result);
   pthread_join(rcv_thread, &thread_result);
+  pthread_join(led_thread, &thread_result);
 
   close(sock);
   return 0;
@@ -57,29 +67,44 @@ int main(int argc, char **argv){
 
 void *send_message(void *arg){
   int sock = *(int *) arg;
-  char name_message[NAMESIZE + BUFSIZE];
+  char message[BUFSIZE];
   while (true){
     fgets(message, BUFSIZE, stdin);
     if (!strcmp(message, "q\n")){
       close(sock);
       exit(0);
     }
-    sprintf(name_message, "%s %s", name, message);
-    write(sock, name_message, strlen(name_message));
+    sprintf(message, "%s", message);
+    write(sock, message, strlen(message));
   }
 }
 
 void *recv_message(void *arg){
   int sock = *(int *) arg;
-  char name_message[NAMESIZE+BUFSIZE];
+  char message[BUFSIZE];
   int str_len;
   while (true){
-    str_len = read(sock, name_message, NAMESIZE+BUFSIZE - 1);
+    str_len = read(sock, message, BUFSIZE - 1);
     if (str_len == -1){
       return (void *)1;
     }
-    name_message[str_len] = 0;
-    fputs(name_message,stdout);
+    message[str_len] = 0;
+    fputs(message,stdout);
+    if (strcmp(message, "turn off")){
+      ledLight = false;
+    } else if (strcmp(message, "turn on")){
+      ledLight = true;
+    }
+  }
+}
+
+void *led_react(void *arg){
+  while (true){
+    if (ledLight = false){
+      digitalWrite(LED1, 0);
+    } else {
+      digitalWrite(LED1, 1);
+    }
   }
 }
 
