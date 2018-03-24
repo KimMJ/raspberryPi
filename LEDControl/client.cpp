@@ -92,9 +92,9 @@ void *recv_message(void *arg){
     }
     message[str_len] = 0;
     fputs(message,stdout);
-    if (strcmp(message, "turn off")){
+    if (strcmp(message, "turn off\n") == 0){
       ledLight = false;
-    } else if (strcmp(message, "turn on")){
+    } else if (strcmp(message, "turn on\n") == 0){
       ledLight = true;
     }
   }
@@ -102,7 +102,7 @@ void *recv_message(void *arg){
 
 void *led_react(void *arg){
   while (true){
-    if (ledLight = false){
+    if (ledLight == false){
       digitalWrite(LED, 0);
     } else {
       digitalWrite(LED, 1);

@@ -1,3 +1,7 @@
 *~
 *.o
 *.so
+*/build/
+server
+client
+client2
