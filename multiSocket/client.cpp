@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <pthread.h>
+#include <wiringPi.h>
 
 //#define NAMESIZE 20
 #define BUFSIZE 100
@@ -13,6 +14,7 @@
 
 void *send_message(void *arg);
 void *recv_message(void *arg);
+void *led_react(void *arg);
 void error_handling(char *message);
 
 //char name[NAMESIZE] = "[Default]";
@@ -53,7 +55,7 @@ int main(int argc, char **argv){
     return 1;
   }
 
-  pinMode(LED1, OUTPUT);
+  pinMode(LED, OUTPUT);
 
   pthread_create(&led_thread, NULL, led_react, NULL);
 
@@ -101,9 +103,9 @@ void *recv_message(void *arg){
 void *led_react(void *arg){
   while (true){
     if (ledLight = false){
-      digitalWrite(LED1, 0);
+      digitalWrite(LED, 0);
     } else {
-      digitalWrite(LED1, 1);
+      digitalWrite(LED, 1);
     }
   }
 }
