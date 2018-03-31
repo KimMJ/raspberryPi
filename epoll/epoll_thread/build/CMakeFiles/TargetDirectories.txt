@@ -1,0 +1,2 @@
+/home/kimmj/raspberryPi/epoll/epoll_thread/build/CMakeFiles/epoll.dir
+/home/kimmj/raspberryPi/epoll/epoll_thread/build/CMakeFiles/net_utils.dir
