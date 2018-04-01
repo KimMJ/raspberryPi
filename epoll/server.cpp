@@ -18,11 +18,7 @@ int main(int argc, char **argv){
   for (int i = 0; i < MAX_CLIENT; i ++){
     g_clients[i].client_socket_fd = -1;
   }
-/*
-  if (pthread_mutex_init(&mutx, NULL)){
-    error_handling(const_cast<char *>("mutex init error\n"));
-  }
-*/
+
   server_init(atoi(argv[1]));
   epoll_init();
 
