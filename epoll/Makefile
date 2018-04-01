@@ -1,3 +1,17 @@
-all:
-	g++ -o server server.cpp server.h -lpthread
-	g++ -o client client.cpp client.h -lpthread
+CC = g++
+OBJS = server.o client.o
+TARGET = server client
+
+.SUFFIXES : .c .o
+
+all: $(TARGET)
+
+$(TARGET):$(OBJS)
+	$(CC) -o $@ $(OBJS)
+
+server.o = server.cpp server.h
+
+client.o = client.cpp client.h
+
+clean:
+	rm $(OBJS) $(TARGET)
