@@ -61,7 +61,8 @@ void *recv_data(void *arg){
       return (void *) 1;
     }
     if (str_len == 0){
-      printf("ended?\n");
+      printf("socket closed\n");
+      return (void *) 1;
     }
     data[str_len] = 0;
     fputs(data, stdout);
