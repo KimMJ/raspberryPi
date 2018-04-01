@@ -14,6 +14,10 @@ int main(int argc, char **argv){
   } else if (atoi(argv[1]) < 1024){
     error_handling("invalid port number\n");
   }
+
+  for (int i = 0; i < MAX_CLIENT; i ++){
+    g_clients[i].client_socket_fd = -1;
+  }
 /*
   if (pthread_mutex_init(&mutx, NULL)){
     error_handling(const_cast<char *>("mutex init error\n"));
@@ -81,7 +85,14 @@ int main(int argc, char **argv){
     if (num_fd == 0){
       continue; // nothing
     } else if (num_fd < 0){
-      printf("epoll wait error : %d\n", num_fd);
+      printf("epoll wait error : %d\n",num_fd );
+      for (int i = 0; i < MAX_EVENTS; i++){
+        if (g_clients[i].client_socket_fd > 0){
+          printf("g_client[i].client_socket_fd = %d\n", g_clients[i].client_socket_fd);
+        
+        }
+      }
+      printf("%s\n",g_events[0].events);
       continue;
     }
 
