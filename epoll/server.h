@@ -21,9 +21,8 @@ struct client {
   char client_ip[20];
 };
 
-void error_handling(char *message);
-void userpoll_add(int client_fd, char * client_ip);
-void userpoll_delete(int client_fd);
+void userpool_add(int client_fd, char * client_ip);
+void userpool_delete(int client_fd);
 void client_receive(int event_fd);
 void epoll_init();
 void server_init(int port);

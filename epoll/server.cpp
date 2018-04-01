@@ -3,6 +3,7 @@
 struct epoll_event g_events[MAX_EVENTS];
 struct client g_clients[MAX_CLIENT];
 int g_epoll_fd, g_server_socket;
+bool server_close = true;
 
 int main(int argc, char **argv){
   if (argc != 2){
@@ -13,6 +14,7 @@ int main(int argc, char **argv){
     exit(1);
   }
 
+  //init g_clients
   for (int i = 0; i < MAX_CLIENT; i ++){
     g_clients[i].client_socket_fd = -1;
   }
@@ -37,12 +39,14 @@ int main(int argc, char **argv){
   return 0;
 }
 
-void *server_process(void *arg){//make return
-  while (true){
+
+void *server_process(void *arg){
+  while (server_close == false){
     struct sockaddr_in client_address;
     int client_length = sizeof(client_address);
     int client_socket;
     int num_fd = epoll_wait(g_epoll_fd, g_events, MAX_EVENTS, 100);
+    
     if (num_fd == 0){
       continue; // nothing
     } else if (num_fd < 0){
@@ -51,28 +55,33 @@ void *server_process(void *arg){//make return
     }
 
     for (int i = 0; i < num_fd; i ++){
-      if (g_events[i].data.fd == g_server_socket){
+      if (g_events[i].data.fd == g_server_socket){//first connect time
         client_socket = accept(g_server_socket, (struct sockaddr *) &client_address, (socklen_t *) &client_length);
         if (client_socket < 0){
           printf("accept_error\n");
         } else {
           printf("new client connected\nfd : %d\nip : %s\n", client_socket, inet_ntoa(client_address.sin_addr));
-          userpoll_add(client_socket, inet_ntoa(client_address.sin_addr));
+          userpool_add(client_socket, inet_ntoa(client_address.sin_addr));
         }
-      } else {
-        printf("data received\n");
+      } else {//already connected. receive handling
         client_receive(g_events[i].data.fd);
       }
     }
   }
 }
 
+//send data to clients
 void *server_send_data(void *arg){
   char buf[BUFSIZE];
   int len;
   while(true){
     fgets(buf, BUFSIZE, stdin);
     sprintf(buf, "%s", buf);
+
+    if (strcmp(buf, "exit\n") == 0){
+      server_close = true;
+      return (void*) NULL;
+    }
 
     for (int i = 0; i < MAX_CLIENT; i ++){
       if (g_clients[i].client_socket_fd != -1){
@@ -82,6 +91,7 @@ void *server_send_data(void *arg){
   }
 }
 
+//??
 bool setnonblocking(int fd, bool blocking=true){
   if (fd < 0) return false;
        
@@ -90,12 +100,14 @@ bool setnonblocking(int fd, bool blocking=true){
   flags = blocking ? (flags&~O_NONBLOCK) : (flags|O_NONBLOCK);
   return (fcntl(fd, F_SETFL, flags) == 0) ? true : false;
 }
+
 void server_init(int port){
   struct sockaddr_in server_address;
 
   g_server_socket = socket(AF_INET, SOCK_STREAM, 0);
   if (g_server_socket == -1){
-    error_handling(const_cast<char *>("socket() error\n"));
+    printf("socket() error\n");
+    exit(1);
   }
 
   memset(&server_address, 0, sizeof(server_address));
@@ -124,6 +136,7 @@ void server_init(int port){
 
   //setnonblocking(g_server_socket);
   printf("server start listening\n");
+  server_close = false;
 }
 
 void epoll_init(){
@@ -148,12 +161,7 @@ void epoll_init(){
   printf("epoll set succeded\n");
 }
 
-void error_handling(char *message){
-  fputs(message, stderr);
-  exit(1);
-}
-
-void userpoll_add(int client_fd, char * client_ip){
+void userpool_add(int client_fd, char * client_ip){
   int i;
   for (i = 0; i < MAX_CLIENT; i ++){
     if (g_clients[i].client_socket_fd == -1) break;
@@ -177,7 +185,7 @@ void userpoll_add(int client_fd, char * client_ip){
   }
 }
 
-void userpoll_delete(int client_fd){
+void userpool_delete(int client_fd){
   int i;
   for (int i = 0; i < MAX_CLIENT; i ++){
     if(g_clients[i].client_socket_fd == client_fd){
@@ -193,7 +201,7 @@ void client_receive(int event_fd){
   int len;
   len = recv(event_fd, buf, BUFSIZE, 0);
   if (len <= 0){
-    userpoll_delete(event_fd);
+    userpool_delete(event_fd);
     close(event_fd);
     return;
   }
