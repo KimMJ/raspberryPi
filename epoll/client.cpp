@@ -52,7 +52,6 @@ void *send_data(void *arg){
 }
 
 void *recv_data(void *arg){
-  printf("received!\n");
   int sock = *(int *) arg;
   char data[BUFSIZE];
   int str_len;
@@ -63,6 +62,5 @@ void *recv_data(void *arg){
     }
     data[str_len] = 0;
     fputs(data, stdout);
-    //something
   }
 }

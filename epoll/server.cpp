@@ -2,17 +2,15 @@
 
 struct epoll_event g_events[MAX_EVENTS];
 struct client g_clients[MAX_CLIENT];
-int g_epoll_fd;
-
+int g_epoll_fd, g_server_socket;
 
 int main(int argc, char **argv){
-  int server_socket;
-  struct sockaddr_in server_address;
   if (argc != 2){
     printf("Usage : %s <port>\n", argv[0]);
     exit(1);
   } else if (atoi(argv[1]) < 1024){
-    error_handling("invalid port number\n");
+    printf("invalid port number\n");
+    exit(1);
   }
 
   for (int i = 0; i < MAX_CLIENT; i ++){
@@ -23,60 +21,23 @@ int main(int argc, char **argv){
     error_handling(const_cast<char *>("mutex init error\n"));
   }
 */
-  server_socket = socket(AF_INET, SOCK_STREAM, 0);
-  if (-1 == server_socket){
-    error_handling(const_cast<char *>("socket() error\n"));
-  }
+  server_init(atoi(argv[1]));
+  epoll_init();
 
-  memset(&server_address, 0, sizeof(server_address));
-  server_address.sin_family = AF_INET;
-  server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-  server_address.sin_port = htons(atoi(argv[1]));
+  pthread_t process_thread,notice_thread;
+  void *thread_result;
 
-  int n_socket_opt = 1;
-  if( setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &n_socket_opt, sizeof(n_socket_opt)) < 0 ){
-    printf("Server Start Fails. : Can't set reuse address\n");
-    close(server_socket);
-    exit(1);
-  }
+  pthread_create(&process_thread, NULL, server_process, NULL);
+  pthread_create(&notice_thread, NULL, server_send_data, NULL);
 
-  if (bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) == -1){
-    printf("bind() error\n");
-    close(server_socket);
-    exit(1);
-  }
+  pthread_join(process_thread, &thread_result);
+  pthread_join(notice_thread, &thread_result);
 
-  if (listen(server_socket, 15) == -1){
-    printf("listen() error\n");
-    close(server_socket);
-    exit(1);
-  }
+  close(g_server_socket);
+  return 0;
+}
 
-  printf("server start listening PORT = %d\n", atoi(argv[1]));
-
-  //epoll init
-  struct epoll_event events;
-
-  g_epoll_fd = epoll_create(MAX_EVENTS);
-  if (g_epoll_fd < 0){
-    printf("epoll create fails\n");
-    close(server_socket);
-    exit(1);
-  }
-
-  printf("epoll created\n");
-
-  events.events = EPOLLIN;
-  events.data.fd = server_socket;
-
-  if (epoll_ctl(g_epoll_fd, EPOLL_CTL_ADD, server_socket, &events) < 0){
-    printf("epoll control failed\n");
-    close(server_socket);
-    exit(1);
-  }
-
-  printf("epoll set succeded\n");
-
+void *server_process(void *arg){//make return
   while (true){
     struct sockaddr_in client_address;
     int client_length = sizeof(client_address);
@@ -86,31 +47,105 @@ int main(int argc, char **argv){
       continue; // nothing
     } else if (num_fd < 0){
       printf("epoll wait error : %d\n",num_fd );
-      for (int i = 0; i < MAX_EVENTS; i++){
-        if (g_clients[i].client_socket_fd > 0){
-          printf("g_client[i].client_socket_fd = %d\n", g_clients[i].client_socket_fd);
-        
-        }
-      }
-      printf("%s\n",g_events[0].events);
       continue;
     }
 
     for (int i = 0; i < num_fd; i ++){
-      if (g_events[i].data.fd == server_socket){
-        client_socket = accept(server_socket, (struct sockaddr *) &client_address, (socklen_t *) &client_length);
+      if (g_events[i].data.fd == g_server_socket){
+        client_socket = accept(g_server_socket, (struct sockaddr *) &client_address, (socklen_t *) &client_length);
         if (client_socket < 0){
           printf("accept_error\n");
         } else {
-          printf("new client connected\nfd : %d\nip : %d\n", client_socket, inet_ntoa(client_address.sin_addr));
+          printf("new client connected\nfd : %d\nip : %s\n", client_socket, inet_ntoa(client_address.sin_addr));
           userpoll_add(client_socket, inet_ntoa(client_address.sin_addr));
         }
       } else {
+        printf("data received\n");
         client_receive(g_events[i].data.fd);
       }
     }
   }
-  
+}
+
+void *server_send_data(void *arg){
+  char buf[BUFSIZE];
+  int len;
+  while(true){
+    fgets(buf, BUFSIZE, stdin);
+    sprintf(buf, "%s", buf);
+
+    for (int i = 0; i < MAX_CLIENT; i ++){
+      if (g_clients[i].client_socket_fd != -1){
+        len = send(g_clients[i].client_socket_fd, buf, strlen(buf), 0);
+      }
+    }
+  }
+}
+
+bool setnonblocking(int fd, bool blocking=true){
+  if (fd < 0) return false;
+       
+  int flags = fcntl(fd, F_GETFL, 0);
+  if (flags < 0) return false;
+  flags = blocking ? (flags&~O_NONBLOCK) : (flags|O_NONBLOCK);
+  return (fcntl(fd, F_SETFL, flags) == 0) ? true : false;
+}
+void server_init(int port){
+  struct sockaddr_in server_address;
+
+  g_server_socket = socket(AF_INET, SOCK_STREAM, 0);
+  if (g_server_socket == -1){
+    error_handling(const_cast<char *>("socket() error\n"));
+  }
+
+  memset(&server_address, 0, sizeof(server_address));
+  server_address.sin_family = AF_INET;
+  server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+  server_address.sin_port = htons(port);
+
+  int n_socket_opt = 1;
+  if( setsockopt(g_server_socket, SOL_SOCKET, SO_REUSEADDR, &n_socket_opt, sizeof(n_socket_opt)) < 0 ){
+    printf("Server Start Fails. : Can't set reuse address\n");
+    close(g_server_socket);
+    exit(1);
+  }
+
+  if (bind(g_server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) == -1){
+    printf("bind() error\n");
+    close(g_server_socket);
+    exit(1);
+  }
+
+  if (listen(g_server_socket, 15) == -1){
+    printf("listen() error\n");
+    close(g_server_socket);
+    exit(1);
+  }
+
+  //setnonblocking(g_server_socket);
+  printf("server start listening\n");
+}
+
+void epoll_init(){
+  struct epoll_event events;
+
+  g_epoll_fd = epoll_create(MAX_EVENTS);
+  if (g_epoll_fd < 0){
+    printf("epoll create fails\n");
+    close(g_server_socket);
+    exit(1);
+  }
+  printf("epoll created\n");
+
+  events.events = EPOLLIN;
+  events.data.fd = g_server_socket;
+
+  if (epoll_ctl(g_epoll_fd, EPOLL_CTL_ADD, g_server_socket, &events) < 0){
+    printf("epoll control failed\n");
+    close(g_server_socket);
+    exit(1);
+  }
+  printf("epoll set succeded\n");
 }
 
 void error_handling(char *message){
@@ -146,6 +181,7 @@ void userpoll_delete(int client_fd){
   int i;
   for (int i = 0; i < MAX_CLIENT; i ++){
     if(g_clients[i].client_socket_fd == client_fd){
+      printf("client is deleted\n");
       g_clients[i].client_socket_fd = -1;
       break;
     }
@@ -168,4 +204,3 @@ void client_receive(int event_fd){
     }
   }
 }
-
