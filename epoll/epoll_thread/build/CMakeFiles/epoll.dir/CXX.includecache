@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -6,7 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/kimmj/raspberryPi/epoll/epoll_thread/src/epoll.cpp
+/home/mj/raspberryPi/epoll/epoll_thread/src/epoll.cpp
+stdio.h
+-
 string.h
 -
 netdb.h
@@ -28,13 +30,13 @@ cassert
 thread
 -
 net_utils.hpp
-/home/kimmj/raspberryPi/epoll/epoll_thread/src/net_utils.hpp
+/home/mj/raspberryPi/epoll/epoll_thread/src/net_utils.hpp
 ring_buffer.hpp
-/home/kimmj/raspberryPi/epoll/epoll_thread/src/ring_buffer.hpp
+/home/mj/raspberryPi/epoll/epoll_thread/src/ring_buffer.hpp
 
-/home/kimmj/raspberryPi/epoll/epoll_thread/src/net_utils.hpp
+/home/mj/raspberryPi/epoll/epoll_thread/src/net_utils.hpp
 
-/home/kimmj/raspberryPi/epoll/epoll_thread/src/ring_buffer.hpp
+/home/mj/raspberryPi/epoll/epoll_thread/src/ring_buffer.hpp
 x86intrin.h
 -
 atomic

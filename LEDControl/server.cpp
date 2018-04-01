@@ -8,7 +8,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
-#include <wiringPi.h>
 
 #define BUFSIZE 100
 #define MAX_CLIENT 10
