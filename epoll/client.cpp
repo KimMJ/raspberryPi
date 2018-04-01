@@ -1,5 +1,7 @@
 #include "client.h"
 
+bool socket_connected = false;
+
 int main(int argc, char **argv){
   int sock;
   struct sockaddr_in server_address;
@@ -26,6 +28,7 @@ int main(int argc, char **argv){
     printf("connect() error\n");
     exit(1);
   }
+  socket_connected = true;
 
   pthread_create(&snd_thread, NULL, send_data, (void *) &sock);
   pthread_create(&rcv_thread, NULL, recv_data, (void *) &sock);
@@ -40,7 +43,7 @@ int main(int argc, char **argv){
 void *send_data(void *arg){
   int sock = *(int *) arg;
   char data[BUFSIZE];
-  while (true){
+  while (socket_connected == true){
     fgets(data, BUFSIZE, stdin);
     if (!strcmp(data, "q\n")){
       close(sock);
@@ -62,6 +65,7 @@ void *recv_data(void *arg){
     }
     if (str_len == 0){
       printf("socket closed\n");
+      socket_connected = false;
       return (void *) 1;
     }
     data[str_len] = 0;
