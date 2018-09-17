@@ -210,7 +210,7 @@ void client_receive(int event_fd){
     }
     */
     
-    int fd = open("receive.txt", O_WRONLY|O_CREAT|O_TRUNC, 0777);
+    int fd = open("receive.jpg", O_WRONLY|O_CREAT|O_TRUNC, 0777);
     
     if (fd == -1){
       //error_handling("File open error");
