@@ -210,13 +210,15 @@ void client_receive(int event_fd){
     }
     */
     
-    int fd = open("receive.jpg", O_WRONLY|O_CREAT|O_TRUNC);
+    int fd = open("receive.jpg", O_WRONLY|O_CREAT|O_TRUNC, 0777);
     
-    if (fd == -1) //error_handling("File open error");
+    if (fd == -1){
+      //error_handling("File open error");
+      printf(";;;;\n");
       exit(1);
-
-    write(fd, buf, len);
+    }
     while ((len = recv(event_fd, buf, len, 0)) != 0) {
+      printf("receiving\n");
       write(fd, buf, len);
     }
     

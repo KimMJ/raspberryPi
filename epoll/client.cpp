@@ -57,6 +57,7 @@ void *send_data(void *arg){
       }
       int len = 0;
       while ((len=read(fd, data, BUFSIZE) != 0)) {
+        printf("transferring\n");
         write(sock, data, len);    
       }
     } else {
