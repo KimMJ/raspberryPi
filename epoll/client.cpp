@@ -40,14 +40,26 @@ int main(int argc, char **argv){
 void *send_data(void *arg){
   int sock = *(int *) arg;
   char data[BUFSIZE];
+  int fd;
   while (true){
     fgets(data, BUFSIZE, stdin);
     if (!strcmp(data, "q\n")){
       close(sock);
       exit(0);
+    } else if (!strcmp(data, "transfer\n")) {
+      fd = open("~/Dropbox/output_0.jpg", O_RDONLY);
+      if (fd == -1) {
+        printf("no file\n");
+        exit(1);
+      }
+      int len = 0;
+      while ((len=read(fd, data, BUFSIZE) != 0)) {
+        write(sock, data, len);    
+      }
+    } else {
+      sprintf(data, "%s", data);
+      write(sock, data, strlen(data));
     }
-    sprintf(data, "%s", data);
-    write(sock, data, strlen(data));
   }
 }
 
