@@ -1,4 +1,6 @@
-#include "client.h"
+#include "client.hpp"
+
+bool socket_connected = false;
 
 int main(int argc, char **argv){
   int sock;
@@ -26,6 +28,7 @@ int main(int argc, char **argv){
     printf("connect() error\n");
     exit(1);
   }
+  socket_connected = true;
 
   pthread_create(&snd_thread, NULL, send_data, (void *) &sock);
   pthread_create(&rcv_thread, NULL, recv_data, (void *) &sock);
@@ -41,7 +44,7 @@ void *send_data(void *arg){
   int sock = *(int *) arg;
   char data[BUFSIZE];
   int fd;
-  while (true){
+  while (socket_connected == true){
     fgets(data, BUFSIZE, stdin);
     if (!strcmp(data, "q\n")){
       close(sock);
@@ -72,8 +75,12 @@ void *recv_data(void *arg){
     if (str_len == -1){
       return (void *) 1;
     }
+    if (str_len == 0){
+      printf("socket closed\n");
+      socket_connected = false;
+      return (void *) 1;
+    }
     data[str_len] = 0;
     fputs(data, stdout);
-    //something
   }
 }
