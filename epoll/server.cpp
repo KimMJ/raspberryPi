@@ -210,10 +210,11 @@ void client_receive(int event_fd){
     */
     int fd = open("receive.jpg", O_WRONLY|O_CREAT|O_TRUNC);
     
-    if (fd == -1) error_handling("File open error");
+    if (fd == -1) //error_handling("File open error");
+      exit(1);
 
     write(fd, buf, len);
-    while ((len = read(g_clients[0].client_socket_fd, buf, len)) != 0) {
+    while ((len = read(g_clients[i].client_socket_fd, buf, len)) != 0) {
       write(fd, buf, len);
     }
   }
