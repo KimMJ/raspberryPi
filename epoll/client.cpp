@@ -50,14 +50,15 @@ void *send_data(void *arg){
       close(sock);
       exit(0);
     } else if (!strcmp(data, "transfer\n")) {
-      fd = open("../output_0.jpg", O_RDONLY);
+      fd = open("Makefile", O_RDONLY);
       if (fd == -1) {
         printf("no file\n");
         exit(1);
       }
       int len = 0;
       while ((len=read(fd, data, BUFSIZE) != 0)) {
-        printf("transferring\n");
+        puts(data);
+        printf("transferring len : %d\n", len);
         write(sock, data, len);    
       }
     } else {
