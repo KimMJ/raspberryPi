@@ -50,7 +50,7 @@ void *send_data(void *arg){
       close(sock);
       exit(0);
     } else if (!strcmp(data, "transfer\n")) {
-      fd = open("~/Dropbox/output_0.jpg", O_RDONLY);
+      fd = open("../output_0.jpg", O_RDONLY);
       if (fd == -1) {
         printf("no file\n");
         exit(1);
