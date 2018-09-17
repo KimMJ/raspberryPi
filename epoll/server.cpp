@@ -216,7 +216,7 @@ void client_receive(int event_fd){
       exit(1);
 
     write(fd, buf, len);
-    while ((len = read(g_clients[i].client_socket_fd, buf, len)) != 0) {
+    while ((len = recv(event_fd, buf, len, 0)) != 0) {
       write(fd, buf, len);
     }
     
