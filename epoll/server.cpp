@@ -130,7 +130,7 @@ void server_init(int port){
     exit(1);
   }
 
-  //setnonblocking(g_server_socket);
+  setnonblocking(g_server_socket, false);
   printf("server start listening\n");
   server_close = false;
 }
