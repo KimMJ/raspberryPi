@@ -204,30 +204,30 @@ void client_receive(int event_fd){
     return;
   }
 
-  for (int i = 0; i < MAX_CLIENT; i ++){
-    if (!strcmp(buf, "transfer\n")) {
-      char fileName[BUFSIZE];
-      sprintf(fileName, "%d%s\n", event_fd, ".jpg");
+  if (!strcmp(buf, "transfer\n")) {
+    char fileName[BUFSIZE];
+    sprintf(fileName, "%d%s\n", event_fd, ".jpg");
       
-      int fd = open(fileName, O_WRONLY|O_CREAT|O_TRUNC, 0777);
+    int fd = open(fileName, O_WRONLY|O_CREAT|O_TRUNC, 0777);
     
-      if (fd == -1){
-        printf("file open error\n");
-        exit(1);
-      }
+    if (fd == -1){
+      printf("file open error\n");
+      exit(1);
+    }
     
+    printf("receiving\n");
+    write(fd, buf, len);
+      
+    while ((len = recv(event_fd, buf, len, 0)) != 0) {
       printf("receiving\n");
       write(fd, buf, len);
-      
-      while ((len = recv(event_fd, buf, len, 0)) != 0) {
-        printf("receiving\n");
-        write(fd, buf, len);
-      }
-    } else {
+    }
+  }
+  else {// chatting
+    for (int i = 0; i < MAX_CLIENT; i ++){
       if (g_clients[i].client_socket_fd != -1){
         len = send(g_clients[i].client_socket_fd, buf, len, 0);
       }
     }
-    
   }
 }

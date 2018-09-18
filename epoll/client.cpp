@@ -7,7 +7,7 @@ using namespace std;
 using namespace cv;
 
 #define INPUT "../cctv.avi"
-#define OUTPUT_PREFIX "img/output"
+#define OUTPUT_PREFIX "output"
 #define OUTPUT_POSTFIX ".jpg"
 
 bool socket_connected = false;
@@ -96,7 +96,7 @@ void *send_data(void *arg){
       close(sock);
       exit(0);
     } else if (!strcmp(data, "transfer\n")) {
-      fd = open("img/output.jpg", O_RDONLY);
+      fd = open("output.jpg", O_RDONLY);
       
       if (fd == -1) {
         printf("no file\n");
