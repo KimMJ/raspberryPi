@@ -110,8 +110,8 @@ void *send_data(void *arg){
       }
 
       //notice transfer
-      sprintf(data, "%d", file_len);
-      printf("%d\n", strlen(data));
+      sprintf(data, "%u", file_len);
+      printf("%u\n", file_len);
       write(sock, data, strlen(data));
       int len = 0;
       while ((len=read(fd, data, BUFSIZE)) != 0) {

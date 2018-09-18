@@ -205,7 +205,8 @@ void client_receive(int event_fd){
     return;
   }
 
-  printf("%s\n", buf);
+  int total_size = atoi(buf);
+  printf("file size : %d\n", total_size);
   //if (!strcmp(buf, "transfer\n")) {
     char fileName[BUFSIZE];
     sprintf(fileName, "%d%s\n", event_fd, ".jpg");
@@ -217,12 +218,10 @@ void client_receive(int event_fd){
       exit(1);
     }
     
-    printf("receiving\n");
-    write(fd, buf, len);
-      
-    while ((len = recv(event_fd, buf, len, 0)) != 0) {
+    while (total_size > 0 && (len = recv(event_fd, buf, len, 0)) != 0) {
       printf("receiving\n");
       write(fd, buf, len);
+      total_size -= len;
     }
     printf("done!\n");
   //}
