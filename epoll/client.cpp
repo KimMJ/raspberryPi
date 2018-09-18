@@ -52,7 +52,7 @@ int main(int argc, char **argv){
 
 void *send_data(void *arg){
   int sock = *(int *) arg;
-  char data[BUFSIZE];
+  char data[BUFSIZE] = {0};
   int fd;
 
   // OPENCV
@@ -97,6 +97,10 @@ void *send_data(void *arg){
       close(sock);
       exit(0);
     } else /*if (!strcmp(data, "transfer\n"))*/ {
+      FILE *f;
+      f = fopen("output.jpg" , "r");
+      fseek(f, 0, SEEK_END);
+      unsigned long file_len = (unsigned long)ftell(f);
 
       fd = open("output.jpg", O_RDONLY);
       
@@ -106,6 +110,7 @@ void *send_data(void *arg){
       }
 
       //notice transfer
+      sprintf(data, "%d", file_len);
       printf("%d\n", strlen(data));
       write(sock, data, strlen(data));
       int len = 0;

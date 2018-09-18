@@ -205,6 +205,7 @@ void client_receive(int event_fd){
     return;
   }
 
+  printf("%s\n", buf);
   //if (!strcmp(buf, "transfer\n")) {
     char fileName[BUFSIZE];
     sprintf(fileName, "%d%s\n", event_fd, ".jpg");
