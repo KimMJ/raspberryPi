@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/Users/kimmj/Documents/hyu/degree.nosync/opencv-3.4.0/samples/cpp/example_cmake/frame2.cpp
+/home/kimmj/raspberryPi/example_cmake/frame2.cpp
 highgui.h
 -
 cv.h
@@ -67,10 +67,6 @@ opencv2/core/mat.hpp
 /usr/local/include/opencv2/opencv2/core/mat.hpp
 opencv2/core/persistence.hpp
 /usr/local/include/opencv2/opencv2/core/persistence.hpp
-opencv2/opencv.hpp
-/usr/local/include/opencv2/opencv2/opencv.hpp
-opencv2/xfeatures2d.hpp
-/usr/local/include/opencv2/opencv2/xfeatures2d.hpp
 opencv2/core/operations.hpp
 /usr/local/include/opencv2/opencv2/core/operations.hpp
 opencv2/core/cvstd.inl.hpp
@@ -119,6 +115,8 @@ opencv2/core.hpp
 /usr/local/include/opencv2/core/opencv2/core.hpp
 opencv2/core/cuda_types.hpp
 /usr/local/include/opencv2/core/opencv2/core/cuda_types.hpp
+opencv2/opencv.hpp
+-
 opencv2/core/cuda.inl.hpp
 /usr/local/include/opencv2/core/opencv2/core/cuda.inl.hpp
 
@@ -150,6 +148,10 @@ popcntintrin.h
 immintrin.h
 -
 arm_neon.h
+-
+immintrin.h
+-
+immintrin.h
 -
 immintrin.h
 -
@@ -190,6 +192,10 @@ cv_cpu_dispatch.h
 intrin.h
 -
 array
+-
+cstdint
+-
+stdint.h
 -
 
 /usr/local/include/opencv2/core/cvstd.hpp
@@ -361,6 +367,42 @@ opencv2/core/core_c.h
 /usr/local/include/opencv2/core/vsx_utils.hpp
 opencv2/core/cvdef.h
 /usr/local/include/opencv2/core/opencv2/core/cvdef.h
+assert.h
+-
+
+/usr/local/include/opencv2/dnn.hpp
+opencv2/dnn/dnn.hpp
+-
+
+/usr/local/include/opencv2/dnn/dict.hpp
+opencv2/core.hpp
+-
+map
+-
+ostream
+-
+opencv2/dnn/dnn.hpp
+-
+
+/usr/local/include/opencv2/dnn/dnn.hpp
+vector
+-
+opencv2/core.hpp
+-
+opencv2/dnn/dict.hpp
+-
+opencv2/dnn/layer.hpp
+-
+opencv2/dnn/dnn.inl.hpp
+-
+
+/usr/local/include/opencv2/dnn/dnn.inl.hpp
+opencv2/dnn.hpp
+-
+
+/usr/local/include/opencv2/dnn/layer.hpp
+opencv2/dnn.hpp
+-
 
 /usr/local/include/opencv2/features2d.hpp
 opencv2/opencv_modules.hpp
@@ -819,8 +861,6 @@ opencv2/videoio/videoio_c.h
 /usr/local/include/opencv2/imgcodecs.hpp
 opencv2/core.hpp
 /usr/local/include/opencv2/opencv2/core.hpp
-opencv2/opencv.hpp
--
 
 /usr/local/include/opencv2/imgcodecs/imgcodecs_c.h
 opencv2/core/core_c.h
@@ -913,6 +953,8 @@ opencv2/calib3d.hpp
 /usr/local/include/opencv2/opencv2/calib3d.hpp
 opencv2/features2d.hpp
 /usr/local/include/opencv2/opencv2/features2d.hpp
+opencv2/dnn.hpp
+/usr/local/include/opencv2/opencv2/dnn.hpp
 opencv2/flann.hpp
 /usr/local/include/opencv2/opencv2/flann.hpp
 opencv2/highgui.hpp
@@ -1295,4 +1337,8 @@ opencv2/videostab/global_motion.hpp
 /usr/local/include/opencv2/videostab/opencv2/videostab/global_motion.hpp
 opencv2/videostab/log.hpp
 /usr/local/include/opencv2/videostab/opencv2/videostab/log.hpp
+
+/usr/local/include/opencv2/xfeatures2d/cuda.hpp
+opencv2/core/cuda.hpp
+/usr/local/include/opencv2/xfeatures2d/opencv2/core/cuda.hpp
 

@@ -5,8 +5,8 @@
 using namespace std;
 using namespace cv;
  
-#define INPUT "/Users/kimmj/Dropbox/cctv.avi"
-#define OUTPUT_PREFIX "img/output_"
+#define INPUT "../cctv.avi"
+#define OUTPUT_PREFIX "img/output"
 #define OUTPUT_POSTFIX ".jpg"
  
 int main()
@@ -40,7 +40,7 @@ int main()
         if (posFrame % 100 == 0) {
           imshow("image", frame);
           stringstream ss;
-          ss << posFrame;
+          ss << "";
           string filename = OUTPUT_PREFIX + ss.str() + OUTPUT_POSTFIX;
           imwrite(filename.c_str(), frame);
         }
