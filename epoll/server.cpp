@@ -195,7 +195,9 @@ void userpool_delete(int client_fd){
 void client_receive(int event_fd){
   char buf[BUFSIZE];
   int len;
+  
   len = recv(event_fd, buf, BUFSIZE, 0);
+
   if (len <= 0){
     userpool_delete(event_fd);
     close(event_fd);
@@ -203,25 +205,28 @@ void client_receive(int event_fd){
   }
 
   for (int i = 0; i < MAX_CLIENT; i ++){
-    /*
+    if (!strcmp(buf, "transfer\n")) {
+      char fileName[BUFSIZE];
+      sprintf(fileName, "%d%s\n", event_fd, ".jpg");
+      
+      int fd = open(fileName, O_WRONLY|O_CREAT|O_TRUNC, 0777);
     
-    if (g_clients[i].client_socket_fd != -1){
-      len = send(g_clients[i].client_socket_fd, buf, len, 0);
-    }
-    */
+      if (fd == -1){
+        printf("file open error\n");
+        exit(1);
+      }
     
-    int fd = open("receive.jpg", O_WRONLY|O_CREAT|O_TRUNC, 0777);
-    
-    if (fd == -1){
-      //error_handling("File open error");
-      printf(";;;;\n");
-      exit(1);
-    }
       printf("receiving\n");
       write(fd, buf, len);
-    while ((len = recv(event_fd, buf, len, 0)) != 0) {
-      printf("receiving\n");
-      write(fd, buf, len);
+      
+      while ((len = recv(event_fd, buf, len, 0)) != 0) {
+        printf("receiving\n");
+        write(fd, buf, len);
+      }
+    } else {
+      if (g_clients[i].client_socket_fd != -1){
+        len = send(g_clients[i].client_socket_fd, buf, len, 0);
+      }
     }
     
   }

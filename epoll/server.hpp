@@ -11,7 +11,7 @@
 #include <pthread.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
-#include <queue.h>
+#include <queue>
 
 #define MAX_CLIENT 1000
 #define MAX_EVENTS 1000
