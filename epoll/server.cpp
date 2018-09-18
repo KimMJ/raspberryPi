@@ -204,17 +204,25 @@ void client_receive(int event_fd){
 
   for (int i = 0; i < MAX_CLIENT; i ++){
     /*
+    
     if (g_clients[i].client_socket_fd != -1){
       len = send(g_clients[i].client_socket_fd, buf, len, 0);
     }
     */
-    int fd = open("receive.jpg", O_WRONLY|O_CREAT|O_TRUNC);
     
-    if (fd == -1) error_handling("File open error");
-
-    write(fd, buf, len);
-    while ((len = read(g_clients[0].client_socket_fd, buf, len)) != 0) {
+    int fd = open("receive.jpg", O_WRONLY|O_CREAT|O_TRUNC, 0777);
+    
+    if (fd == -1){
+      //error_handling("File open error");
+      printf(";;;;\n");
+      exit(1);
+    }
+      printf("receiving\n");
+      write(fd, buf, len);
+    while ((len = recv(event_fd, buf, len, 0)) != 0) {
+      printf("receiving\n");
       write(fd, buf, len);
     }
+    
   }
 }
