@@ -1,9 +1,25 @@
-#include "client.hpp"
 #include <opencv/cv.hpp>
 #include <unistd.h>
 #include <string>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include "data.hpp"
 
+#define BUFSIZE 1024
+#define LED 4
+#define DEFAULT_EXPIRE 5
+
+void *send_data(void *arg);
+void *recv_data(void *arg);
+void *alarm_timer(void *arg);
 using namespace std;
 using namespace cv;
 
@@ -12,11 +28,14 @@ using namespace cv;
 #define OUTPUT_POSTFIX ".jpg"
 
 bool socket_connected = false;
+int expire = DEFAULT_EXPIRE;
+int cur_timer = 0;
+enum Light cur_light = RED;
 
 int main(int argc, char **argv){
   int sock;
   struct sockaddr_in server_address;
-  pthread_t snd_thread, rcv_thread;
+  pthread_t snd_thread, rcv_thread, alarm_thread;
   void *thread_result;
 
   if (!(argc == 3)){
@@ -43,12 +62,32 @@ int main(int argc, char **argv){
 
   pthread_create(&snd_thread, NULL, send_data, (void *) &sock);
   pthread_create(&rcv_thread, NULL, recv_data, (void *) &sock);
+  pthread_create(&alarm_thread, NULL, alarm_timer, (void *) &sock);
 
   pthread_join(snd_thread, &thread_result);
   pthread_join(rcv_thread, &thread_result);
+  pthread_join(alarm_thread, &thread_result);
   
   close(sock);
   return 0;
+}
+
+void *alarm_timer(void *arg) {
+  while (true) {
+    while (expire > cur_timer){
+      sleep(1);
+      cur_timer ++;
+    }
+    if (cur_light == RED) {
+      cur_light = GREEN;
+      printf("RED to GREEN\n");
+    } else {
+      cur_light = RED;
+      printf("GREEN to RED\n");
+    }
+    cur_timer = 0;
+    expire = DEFAULT_EXPIRE;
+  }
 }
 
 void *send_data(void *arg){
@@ -111,10 +150,10 @@ void *send_data(void *arg){
       }
 
       //notice transfer
-      sprintf(data, "%u\0", file_len);
-      printf("%u\0", file_len);
+      memset(data, 0, BUFSIZE);
+      sprintf(data, "%u", file_len);
+      printf("file size : %u\n", file_len);
       write(sock, data, strlen(data));
-      usleep(100);
 
       int len = 0;
       while ((len=read(fd, data, BUFSIZE)) != 0) {
@@ -135,16 +174,20 @@ void *recv_data(void *arg){
   char data[BUFSIZE];
   int str_len;
   while (true){
-    str_len = read(sock, data, BUFSIZE - 1);
+    memset(data, 0, BUFSIZE);
+
+    str_len = read(sock, data, BUFSIZE);
+    
     if (str_len == -1){
       return (void *) 1;
     }
+    
     if (str_len == 0){
       printf("socket closed\n");
       socket_connected = false;
       return (void *) 1;
     }
-    data[str_len] = 0;
-    fputs(data, stdout);
+    printf("new expire : %d\n", atoi(data));
+    expire = atoi(data);
   }
 }
