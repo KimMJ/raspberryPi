@@ -78,7 +78,7 @@ void *send_data(void *arg){
             break;
         }
 
-        if (posFrame % 100 == 0) { // every 100 frames
+        if (posFrame % 500 == 0) { // every 500 frames
           imshow("image", frame);
           stringstream ss;
           ss << "";
@@ -90,12 +90,13 @@ void *send_data(void *arg){
     }
     // END OF OPENCV
 
-    fgets(data, BUFSIZE, stdin);
+    //fgets(data, BUFSIZE, stdin);
 
     if (!strcmp(data, "q\n")){
       close(sock);
       exit(0);
-    } else if (!strcmp(data, "transfer\n")) {
+    } else /*if (!strcmp(data, "transfer\n"))*/ {
+
       fd = open("output.jpg", O_RDONLY);
       
       if (fd == -1) {
@@ -104,18 +105,18 @@ void *send_data(void *arg){
       }
 
       //notice transfer
-      write(sock, data, strlen("transfer\n"));
-
+      printf("%d\n", strlen(data));
+      write(sock, data, strlen(data));
       int len = 0;
       while ((len=read(fd, data, BUFSIZE)) != 0) {
-        puts(data);
+        //puts(data);
         printf("transferring len : %d\n", len);
         write(sock, data, len);    
       }
-    } else {
+    } /*else {
       sprintf(data, "%s", data);
       write(sock, data, strlen(data));
-    }
+    }*/
   }
 }
 

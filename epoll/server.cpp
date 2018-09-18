@@ -204,7 +204,7 @@ void client_receive(int event_fd){
     return;
   }
 
-  if (!strcmp(buf, "transfer\n")) {
+  //if (!strcmp(buf, "transfer\n")) {
     char fileName[BUFSIZE];
     sprintf(fileName, "%d%s\n", event_fd, ".jpg");
       
@@ -222,7 +222,8 @@ void client_receive(int event_fd){
       printf("receiving\n");
       write(fd, buf, len);
     }
-  }
+  //}
+  /*
   else {// chatting
     for (int i = 0; i < MAX_CLIENT; i ++){
       if (g_clients[i].client_socket_fd != -1){
@@ -230,4 +231,5 @@ void client_receive(int event_fd){
       }
     }
   }
+  */
 }
