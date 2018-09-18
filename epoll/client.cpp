@@ -1,5 +1,6 @@
 #include "client.hpp"
 #include <opencv/cv.hpp>
+#include <unistd.h>
 #include <string>
 #include <iostream>
 
@@ -75,11 +76,11 @@ void *send_data(void *arg){
         vc >> frame;
 
         if (frame.empty()) {
-            close(sock);
-            break;
+          exit(0);
+            return (void*) 0;
         }
 
-        if (posFrame % 500 == 0) { // every 500 frames
+        if (posFrame % 100 == 0) { // every 500 frames
           imshow("image", frame);
           stringstream ss;
           ss << "";
@@ -110,9 +111,11 @@ void *send_data(void *arg){
       }
 
       //notice transfer
-      sprintf(data, "%u", file_len);
-      printf("%u\n", file_len);
+      sprintf(data, "%u\0", file_len);
+      printf("%u\0", file_len);
       write(sock, data, strlen(data));
+      usleep(100);
+
       int len = 0;
       while ((len=read(fd, data, BUFSIZE)) != 0) {
         //puts(data);
