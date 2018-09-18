@@ -56,6 +56,7 @@ void *server_process(void *arg){
         if (client_socket < 0){
           printf("accept_error\n");
         } else {
+          printf("set non blocking : %d\n", setnonblocking(client_socket, false));
           printf("new client connected\nfd : %d\nip : %s\n", client_socket, inet_ntoa(client_address.sin_addr));
           userpool_add(client_socket, inet_ntoa(client_address.sin_addr));
         }
