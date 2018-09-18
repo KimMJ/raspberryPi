@@ -222,6 +222,7 @@ void client_receive(int event_fd){
       printf("receiving\n");
       write(fd, buf, len);
     }
+    printf("done!\n");
   //}
   /*
   else {// chatting

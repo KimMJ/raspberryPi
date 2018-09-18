@@ -75,6 +75,7 @@ void *send_data(void *arg){
         vc >> frame;
 
         if (frame.empty()) {
+            close(sock);
             break;
         }
 
@@ -113,6 +114,7 @@ void *send_data(void *arg){
         printf("transferring len : %d\n", len);
         write(sock, data, len);    
       }
+      printf("done!\n");
     } /*else {
       sprintf(data, "%s", data);
       write(sock, data, strlen(data));
