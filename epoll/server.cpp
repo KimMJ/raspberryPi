@@ -228,7 +228,7 @@ void client_receive(int event_fd){
   int len;
   
   memset(buf, 0, BUFSIZE);
-  len = recv(event_fd, buf, BUFSIZE, 0);
+  len = recv(event_fd, buf, 10, 0);
 
   if (len <= 0){
     userpool_delete(event_fd);
@@ -255,6 +255,7 @@ void client_receive(int event_fd){
     printf("receiving : %d remain : %d\n", len, total_size);
     write(fd, buf, len);
     total_size -= len;
+    size = (BUFSIZE > total_size) ? total_size : BUFSIZE; 
   }
   
 

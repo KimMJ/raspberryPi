@@ -1,5 +1,5 @@
 all: 
-	g++ -o server server.cpp server.hpp -lpthread
+	g++ -o server server.cpp -lpthread
 
 clean:
 	rm server

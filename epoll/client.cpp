@@ -159,15 +159,15 @@ void *send_data(void *arg){
       */
       //notice transfer
       memset(data, 0, BUFSIZE);
-      sprintf(data, "%lu", file_len);
-      printf("file size : %lu\n", file_len);
-      write(sock, data, strlen(data));
+      sprintf(data, "%010lu", file_len);
+      printf("file size : %s\n", data);
+      send(sock, data, strlen(data), 0);
 
       int len = 0;
       while ((len=read(fd, data, BUFSIZE)) != 0) {
         //puts(data);
         printf("transferring len : %d\n", len);
-        write(sock, data, len);    
+        send(sock, data, len, 0);    
       }
       printf("done!\n");
     } 
@@ -187,7 +187,7 @@ void *recv_data(void *arg){
   while (true){
     memset(data, 0, BUFSIZE);
 
-    str_len = read(sock, data, BUFSIZE);
+    str_len = recv(sock, data, BUFSIZE, 0);
     
     if (str_len == -1){
       return (void *) 1;
