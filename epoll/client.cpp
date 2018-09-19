@@ -123,7 +123,8 @@ void *send_data(void *arg){
           imshow("image", frame);
           stringstream ss;
           ss << "";
-          string filename = OUTPUT_PREFIX + ss.str() + OUTPUT_POSTFIX;
+          //string filename = OUTPUT_PREFIX + ss.str() + OUTPUT_POSTFIX;
+          string filename = "output.jpg";
           imwrite(filename.c_str(), frame);
           break;
         }
@@ -136,7 +137,7 @@ void *send_data(void *arg){
     if (!strcmp(data, "q\n")){
       close(sock);
       exit(0);
-    } else /*if (!strcmp(data, "transfer\n"))*/ {
+    } else {
       FILE *f;
       f = fopen("output.jpg" , "r");
       fseek(f, 0, SEEK_END);
@@ -149,10 +150,17 @@ void *send_data(void *arg){
         exit(1);
       }
 
+      //scp
+      /*
+      int ret = system("scp output.jpg kimmj@10.78.152.63:~/raspberryPi/epoll/output3.jpg");
+      if (ret != 0) {
+        printf("some error occured!\n");
+      }
+      */
       //notice transfer
       memset(data, 0, BUFSIZE);
-      sprintf(data, "%u", file_len);
-      printf("file size : %u\n", file_len);
+      sprintf(data, "%lu", file_len);
+      printf("file size : %lu\n", file_len);
       write(sock, data, strlen(data));
 
       int len = 0;
@@ -162,10 +170,13 @@ void *send_data(void *arg){
         write(sock, data, len);    
       }
       printf("done!\n");
-    } /*else {
+    } 
+    /*
+    else {
       sprintf(data, "%s", data);
       write(sock, data, strlen(data));
-    }*/
+    }
+    */
   }
 }
 

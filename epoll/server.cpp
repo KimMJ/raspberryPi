@@ -194,7 +194,7 @@ void userpool_add(int client_fd, char * client_ip){
   }
   if (i >= MAX_CLIENT) {
     printf("client is full\n");
-    close(client_fd);
+   close(client_fd);
   }
 
   g_clients[i].client_socket_fd = client_fd;
@@ -236,24 +236,27 @@ void client_receive(int event_fd){
     return;
   }
 
+  
   int total_size = atoi(buf);
   printf("file size : %d, len : %d\n", total_size, len);
 
   char fileName[BUFSIZE];
-  sprintf(fileName, "%d%s\n", event_fd, ".jpg");
-      
+  sprintf(fileName, "%d%s", event_fd, ".jpg");
+
+  printf("trying to %s file open.\n", fileName);    
   int fd = open(fileName, O_WRONLY|O_CREAT|O_TRUNC, 0777);
     
   if (fd == -1){
     printf("file open error\n");
     exit(1);
   }
-    
-  while (total_size > 0 && (len = recv(event_fd, buf, BUFSIZE, 0)) > 0) {
+  int size = (BUFSIZE > total_size) ? total_size : BUFSIZE; 
+  while (total_size > 0 && (len = recv(event_fd, buf, size, 0)) > 0) {
     printf("receiving : %d remain : %d\n", len, total_size);
     write(fd, buf, len);
     total_size -= len;
   }
+  
 
   printf("done!\n");
 }
